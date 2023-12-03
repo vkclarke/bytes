@@ -11,6 +11,7 @@ func main() {
 	out := os.Stdout
 
 	pipe := make(chan byte, 32)
+	done := make(chan int)
 
 	go func() {
 		for {
@@ -24,7 +25,13 @@ func main() {
 		close(pipe)
 	}()
 
-	for b := range pipe {
-		fmt.Fprintln(out, b)
-	}
+	go func() {
+		for b := range pipe {
+			fmt.Fprintln(out, b)
+		}
+
+		done <- 0
+	}()
+
+	os.Exit(<-done)
 }
