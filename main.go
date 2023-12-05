@@ -7,31 +7,19 @@ import (
 )
 
 func main() {
-	in := bufio.NewReader(os.Stdin)
-	out := os.Stdout
-
-	pipe := make(chan byte, 32)
-	done := make(chan int)
+	pipe := make(chan byte, 1024)
 
 	go func() {
-		for {
-			b, err := in.ReadByte()
-			if err != nil {
-				break
-			}
+		in := bufio.NewReader(os.Stdin)
+
+		for b, eof := in.ReadByte(); eof == nil; b, eof = in.ReadByte() {
 			pipe <- b
 		}
 
 		close(pipe)
 	}()
 
-	go func() {
-		for b := range pipe {
-			fmt.Fprintln(out, b)
-		}
-
-		done <- 0
-	}()
-
-	os.Exit(<-done)
+	for b := range pipe {
+		fmt.Println(b)
+	}
 }
