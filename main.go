@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	pipe := make(chan byte, 1024)
+	pipe := make(chan byte, os.Getpagesize())
 
 	go func() {
 		in := bufio.NewReader(os.Stdin)
